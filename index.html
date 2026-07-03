@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Numely · Chaldean · Vedic · Pythagorean Numerology</title>
+<meta name="description" content="Calculate Chaldean, Vedic and Pythagorean numerology numbers from your name and date of birth.">
+<meta name="theme-color" content="#14121f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Numely">
+<link rel="manifest" href="manifest.json" type="application/manifest+json">
+<link rel="icon" href="icons/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --radius:14px;
+  --font-display:'Inter',system-ui,sans-serif;
+  --font-body:'Work Sans',system-ui,sans-serif;
+  --font-num:'Inter',system-ui,sans-serif;
+}
+html[data-theme="dark"]{
+  --bg:#14121f; --surface:#1e1b2e; --surface2:#262238; --text:#edeaf7; --muted:#9c93b8;
+  --accent:#8a6ae0; --accent2:#d4af37; --border:#33304a; --ring:#8a6ae055;
+}
+html[data-theme="light"]{
+  --bg:#f6f4fb; --surface:#ffffff; --surface2:#eeebf9; --text:#1e1b2e; --muted:#635c7a;
+  --accent:#6c4ab6; --accent2:#a9791c; --border:#dcd7ee; --ring:#6c4ab633;
+}
+html[data-theme="oled"]{
+  --bg:#000000; --surface:#0a0a0a; --surface2:#141414; --text:#f0eef7; --muted:#8a8398;
+  --accent:#9d7bff; --accent2:#e0b93f; --border:#201f26; --ring:#9d7bff44;
+}
+html[data-theme="hc"]{
+  --bg:#000000; --surface:#000000; --surface2:#0d0d0d; --text:#ffffff; --muted:#ffffff;
+  --accent:#ffd400; --accent2:#00e5ff; --border:#ffffff; --ring:#ffd40066;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0; padding:0;}
+body{
+  background:var(--bg); color:var(--text); font-family:var(--font-body);
+  min-height:100dvh; display:flex; flex-direction:column; align-items:center;
+  transition:background .25s ease,color .25s ease;
+}
+a{color:var(--accent);}
+.wrap{width:100%; max-width:640px; padding:calc(20px + env(safe-area-inset-top)) 16px 0; display:flex; flex-direction:column; align-items:center; flex:1;}
+
+/* top bar */
+.topbar{width:100%; display:flex; justify-content:space-between; align-items:center; gap:10px;}
+.brand{display:flex; flex-direction:column; line-height:1.1;}
+.brand .eyebrow{font-family:var(--font-num); font-size:.68rem; letter-spacing:.18em; color:var(--accent2); text-transform:uppercase;}
+.brand h1{font-family:var(--font-display); font-size:1.35rem; margin:2px 0 0; font-weight:700;}
+.theme-toggle{display:flex; gap:4px; background:var(--surface2); border:1px solid var(--border); border-radius:999px; padding:4px;}
+.theme-toggle button{
+  width:40px; height:40px; border-radius:999px; border:none; background:transparent; color:var(--muted);
+  font-size:.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.2s; touch-action:manipulation;
+}
+.theme-toggle button.active{background:var(--accent); color:#0c0a14;}
+
+/* hero seal */
+.hero{width:100%; text-align:center; margin:22px 0 8px;}
+.seal{
+  width:96px; height:96px; margin:0 auto 10px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, var(--accent2), var(--accent) 65%, var(--surface2) 100%);
+  display:flex; align-items:center; justify-content:center; font-family:var(--font-num); font-weight:700; font-variant-numeric:tabular-nums;
+  font-size:1.6rem; color:#0c0a14; border:1px solid var(--border); box-shadow:0 0 0 6px var(--ring);
+}
+.hero p{color:var(--muted); font-size:.9rem; max-width:44ch; margin:0 auto;}
+
+/* card / form */
+.card{
+  width:100%; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:18px; margin-top:18px;
+}
+.field{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
+.field label{font-size:.78rem; color:var(--muted); letter-spacing:.03em;}
+.field input{
+  background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:10px;
+  padding:12px 14px; font-size:1rem; font-family:var(--font-body); outline:none;
+}
+.field input:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--ring);}
+.btn-row{display:flex; gap:10px;}
+.btn{
+  flex:1; padding:13px; border-radius:10px; border:none; background:var(--accent); color:#0c0a14;
+  font-weight:600; font-size:.95rem; cursor:pointer; letter-spacing:.02em;
+}
+.btn.secondary{background:transparent; color:var(--text); border:1px solid var(--border);}
+.btn:active{transform:scale(.98);}
+.error{color:#ff6b6b; font-size:.82rem; min-height:1.2em; margin-top:-4px; margin-bottom:8px;}
+.error.tip{color:var(--muted);}
+
+/* tabs */
+.tabs{display:flex; gap:6px; margin-top:18px; width:100%; background:var(--surface2); padding:4px; border-radius:12px; border:1px solid var(--border);}
+.tabs button{
+  flex:1; padding:9px 4px; border:none; background:transparent; color:var(--muted); border-radius:8px;
+  font-family:var(--font-body); font-weight:600; font-size:.82rem; cursor:pointer;
+}
+.tabs button.active{background:var(--accent); color:#0c0a14;}
+
+/* results */
+.results{width:100%; margin-top:16px; display:none; flex-direction:column; gap:10px;}
+.results.show{display:flex;}
+.rcard{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:14px 16px; display:flex; align-items:center; gap:14px;
+}
+.rnum{
+  font-family:var(--font-num); font-weight:700; font-size:1.5rem; color:var(--accent); font-variant-numeric:tabular-nums;
+  min-width:48px; height:48px; display:flex; align-items:center; justify-content:center;
+  background:var(--surface2); border-radius:50%; border:1px solid var(--border); flex-shrink:0;
+}
+.rtext h3{margin:0 0 6px; font-size:.92rem; font-family:var(--font-display); font-weight:700;}
+.rtext .raw{color:var(--muted); font-family:var(--font-num); font-weight:500; font-size:.78rem;}
+.rtext p{margin:0 0 6px; font-size:.82rem; color:var(--muted); line-height:1.4;}
+.rtext p:last-child{margin-bottom:0;}
+.rtext p strong{color:var(--accent2); font-family:var(--font-num);}
+
+footer{
+  width:100%; max-width:640px; margin-top:auto; padding:22px 16px calc(26px + env(safe-area-inset-bottom)); text-align:center;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  color:var(--muted); font-size:.78rem; border-top:1px solid var(--border);
+}
+footer strong{color:var(--text); font-family:var(--font-num);}
+
+@media(min-width:560px){
+  .brand h1{font-size:1.55rem;}
+  .seal{width:112px; height:112px; font-size:1.85rem;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><h1>Numely</h1></div>
+    <div class="theme-toggle" id="themeToggle">
+      <button data-t="light" title="Light">☀</button>
+      <button data-t="dark" title="Dark">☾</button>
+      <button data-t="oled" title="OLED Black">●</button>
+      <button data-t="hc" title="High Contrast">◐</button>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="seal" id="seal">✧</div>
+    <p>Enter your name and date of birth to reveal your core numbers across Chaldean, Vedic and Pythagorean numerology.</p>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label for="fullname">Full name (letters and/or numbers)</label>
+      <input id="fullname" type="text" placeholder="Enter full name" autocomplete="name">
+    </div>
+    <div class="field">
+      <label for="dob">Date of birth</label>
+      <input id="dob" type="date">
+    </div>
+    <div class="error" id="errMsg"></div>
+    <div class="btn-row">
+      <button class="btn" id="calcBtn">Calculate</button>
+      <button class="btn secondary" id="resetBtn">Reset</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button data-sys="pythagorean" class="active">Pythagorean</button>
+    <button data-sys="chaldean">Chaldean</button>
+    <button data-sys="vedic">Vedic</button>
+  </div>
+
+  <div class="results" id="results"></div>
+</div>
+
+<footer>
+  <div>© Manik Roy <strong id="yearLine"></strong>. All Rights Reserved.</div>
+</footer>
+
+<script>
+/* ---------- theme (isolated: a failure here must never block the calculator below) ---------- */
+try {
+  const html = document.documentElement;
+  const themeBtns = document.querySelectorAll('#themeToggle button');
+  var setTheme = function(t){
+    html.setAttribute('data-theme', t);
+    themeBtns.forEach(b=>b.classList.toggle('active', b.dataset.t===t));
+  };
+  themeBtns.forEach(b=>b.addEventListener('click', ()=>setTheme(b.dataset.t)));
+  setTheme(matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+} catch(e) { console.error('Theme init failed:', e); }
+
+/* ---------- footer year (isolated) ---------- */
+try {
+  const START_YEAR = 2026;
+  const now = new Date().getFullYear();
+  const yearEl = document.getElementById('yearLine');
+  if(yearEl) yearEl.textContent = now > START_YEAR ? `${START_YEAR}\u2013${now}` : `${START_YEAR}`;
+} catch(e) { console.error('Footer year init failed:', e); }
+
+/* ---------- letter maps ---------- */
+const VOWELS = new Set(['A','E','I','O','U']);
+function pythValue(ch){ return ((ch.charCodeAt(0)-65)%9)+1; }
+const CHALDEAN = {};
+[['AIJQY',1],['BKR',2],['CGLS',3],['DMT',4],['EHNX',5],['UVW',6],['OZ',7],['FP',8]]
+  .forEach(([letters,val])=>{ for(const l of letters) CHALDEAN[l]=val; });
+
+/* ---------- reduction ---------- */
+function digitSum(n){ return String(n).split('').reduce((a,c)=>a+ +c,0); }
+function reduce(n, keepMaster){
+  while(n>9 && !(keepMaster && [11,22,33].includes(n))) n = digitSum(n);
+  return n;
+}
+
+/* ---------- meanings ---------- */
+const MEANING = {
+  1:'Leadership, independence and drive.',2:'Harmony, partnership and sensitivity.',
+  3:'Creativity, self-expression and joy.',4:'Stability, discipline and structure.',
+  5:'Freedom, change and adventure.',6:'Responsibility, nurturing and balance.',
+  7:'Introspection, wisdom and spirituality.',8:'Power, ambition and material success.',
+  9:'Compassion, completion and humanitarian ideals.',
+  11:'Intuition and illumination — a master teacher number.',
+  22:'The master builder — large-scale vision made real.',
+  33:'The master healer — selfless, compassionate service.'
+};
+
+/* compound (pre-reduction) number meanings, traditional Chaldean-style readings */
+const COMPOUND = {
+  10:'New beginnings after ups and downs; independence earned through experience.',
+  11:'Idealism and revelation; spiritual insight paired with inner tension.',
+  12:'Sacrifice for others; patience needed to avoid being taken advantage of.',
+  13:'Transformation through upheaval; hard work turns setbacks into progress.',
+  14:'Movement and change; caution needed around impulsiveness and excess.',
+  15:'Charisma and magnetism; family and home matters feature strongly.',
+  16:'Sudden upheaval that reshapes the ego; a fall that teaches humility.',
+  17:'Renewal after difficulty; inner strength and quiet victory.',
+  18:'Conflict and materialism; success requires ethical discipline.',
+  19:'The sun number; happiness, success and self-reliance.',
+  20:'Awakening and partnership; intuition guiding a calling to serve.',
+  21:'Favour and reward; creative promotion, often after quiet struggle.',
+  22:'The master builder; grand plans realised through practical effort.',
+  23:'Protection and support arriving through help from others.',
+  24:'Cooperation bringing fortune, especially through relationships.',
+  25:'Wisdom gained through observation and analysis of experience.',
+  26:'A warning around partnerships or finances; caution advised.',
+  27:'Authority earned through spiritual and intellectual effort.',
+  28:'Contradiction between gain and loss; self-reliance is essential.',
+  29:'Emotional trials and deception to be met with vigilance.',
+  30:'Contemplation and philosophical depth; introspective and steady.',
+  31:'Solitary achievement through self-reliant, disciplined effort.',
+  32:'Magnetic influence and creative promise, tinged with unpredictability.',
+  33:'The master healer; compassion expressed through selfless guidance.',
+  34:'Wisdom through study, similar to 25 but tempered by caution.',
+  35:'Steady progress through practical decisions and sound judgement.',
+  36:'Love and cooperation blended with responsibility to others.',
+  37:'Contentment through partnership; harmony and quiet good fortune.',
+  38:'Mixed fortune; caution advised despite periods of gain.',
+  39:'High ideals achieved through devoted service to others.',
+  40:'Obstacles that test resolve; discipline turns hardship into gain.',
+  41:'Original ideas taking practical shape through steady effort.',
+  42:'Guidance and protection arriving through helpful associations.',
+  43:'Upheaval and unpredictability; adaptability is the key lesson.',
+  44:'Practical mastery and steady accumulation of resources.',
+  45:'Sound judgement and versatility applied to worldly affairs.',
+  46:'Effort rewarded through consistent, grounded application.',
+  47:'Support arriving after diligent, patient work.',
+  48:'Sound foundations built through order and methodical planning.',
+  49:'Fresh cycles opening through review of past experience.',
+  50:'Wisdom distilled from experience, guiding sound decisions.',
+  51:'Leadership tempered by adaptability and quick decision-making.',
+  52:'Fresh initiative following change, favouring bold new starts.'
+};
+const COMPOUND_FALLBACK = 'A rarer compound vibration; its energy resolves into the single digit meaning below.';
+
+/* ---------- name sums ---------- */
+function nameSum(name, map){
+  let all=0, vowel=0, cons=0;
+  for(const raw of name.toUpperCase()){
+    if(/[0-9]/.test(raw)){ all += Number(raw); continue; }
+    if(!/[A-Z]/.test(raw)) continue;
+    const v = map(raw);
+    all += v;
+    if(VOWELS.has(raw)) vowel += v; else cons += v;
+  }
+  return {all, vowel, cons};
+}
+
+/* ---------- date sums ---------- */
+function dateParts(dob){
+  const [y,m,d] = dob.split('-').map(Number);
+  return {y,m,d};
+}
+function fullDateSum({y,m,d}){ return digitSum(y)+digitSum(m)+digitSum(d); }
+
+/* ---------- system builders ---------- */
+function row(label, raw, keepMaster, desc){
+  return {label, raw, val: reduce(raw, keepMaster), desc};
+}
+function buildPythagorean(name, dob){
+  const {all,vowel,cons} = nameSum(name, pythValue);
+  const rows = [];
+  if(dob) rows.push(row('Life Path Number', fullDateSum(dateParts(dob)), true, 'Your core life direction, from your date of birth.'));
+  rows.push(row('Expression Number', all, true, 'Your natural talents and abilities, from your full name.'));
+  rows.push(row('Soul Urge Number', vowel, true, 'Your inner motivation, from the vowels in your name.'));
+  rows.push(row('Personality Number', cons, true, 'How others perceive you, from the consonants.'));
+  return rows;
+}
+function buildChaldean(name, dob){
+  const {all,vowel,cons} = nameSum(name, ch=>CHALDEAN[ch]||0);
+  const rows = [row('Name Number', all, false, 'Your compound destiny as shaped by your name, Chaldean chart.')];
+  if(dob) rows.push(row('Birth / Destiny Number', fullDateSum(dateParts(dob)), false, 'The path fixed by your date of birth.'));
+  rows.push(row('Soul Urge Number', vowel, false, 'Inner desire, from the vowels of your name.'));
+  rows.push(row('Personality Number', cons, false, 'Outer impression, from the consonants of your name.'));
+  return rows;
+}
+function buildVedic(name, dob){
+  const {all} = nameSum(name, ch=>CHALDEAN[ch]||0);
+  const rows = [];
+  if(dob){
+    const dp = dateParts(dob);
+    rows.push(row('Psychic Number (Moolank)', dp.d, false, 'Your innate nature, ruled by your birth day.'));
+    rows.push(row('Destiny Number (Bhagyank)', fullDateSum(dp), false, 'Your life\u2019s fortune, from your full birth date.'));
+  }
+  rows.push(row('Name Number', all, false, 'Vibration of your name, using the Chaldean value chart.'));
+  return rows;
+}
+const SYSTEMS = {pythagorean:buildPythagorean, chaldean:buildChaldean, vedic:buildVedic};
+
+/* ---------- render ---------- */
+let activeSys = 'pythagorean';
+let lastResult = null;
+
+function render(){
+  const box = document.getElementById('results');
+  if(!lastResult){ box.classList.remove('show'); box.innerHTML=''; return; }
+  const rows = SYSTEMS[activeSys](lastResult.name, lastResult.dob);
+  box.innerHTML = rows.map(r=>{
+    const isCompound = r.raw>9 && r.raw!==r.val;
+    const compoundLine = isCompound
+      ? `<p><strong>${r.raw}</strong> compound — ${COMPOUND[r.raw]||COMPOUND_FALLBACK}</p>` : '';
+    return `
+    <div class="rcard">
+      <div class="rnum">${r.val}</div>
+      <div class="rtext">
+        <h3>${r.label}${isCompound?` <span class="raw">(${r.raw} \u2192 ${r.val})</span>`:''}</h3>
+        ${compoundLine}
+        <p><strong>${r.val}</strong> single digit — ${MEANING[r.val]||r.desc}</p>
+      </div>
+    </div>`;
+  }).join('');
+  box.classList.add('show');
+  document.getElementById('seal').textContent = rows[0].val;
+}
+
+document.querySelectorAll('.tabs button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    try{
+      document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      activeSys = b.dataset.sys;
+      render();
+    }catch(e){ console.error('Tab switch failed:', e); }
+  });
+});
+
+document.getElementById('calcBtn').addEventListener('click', ()=>{
+  try{
+    const name = document.getElementById('fullname').value.trim();
+    const dob = document.getElementById('dob').value;
+    const err = document.getElementById('errMsg');
+    if(!/[A-Za-z0-9]/.test(name)){ err.className='error'; err.textContent='Please enter a valid name (letters and/or numerals).'; return; }
+    err.className = dob ? 'error' : 'error tip';
+    err.textContent = dob ? '' : 'No date of birth given — showing name-based numbers only.';
+    lastResult = {name, dob};
+    render();
+  }catch(e){ console.error('Calculate failed:', e); }
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  try{
+    document.getElementById('fullname').value = '';
+    document.getElementById('dob').value = '';
+    const err = document.getElementById('errMsg');
+    err.className = 'error';
+    err.textContent = '';
+    lastResult = null;
+    document.getElementById('seal').textContent = '✧';
+    render();
+  }catch(e){ console.error('Reset failed:', e); }
+});
+
+/* ---------- PWA: service worker registration (isolated) ---------- */
+try {
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+    });
+  }
+} catch(e) { console.error('Service worker registration failed:', e); }
+</script>
+</body>
+</html>
